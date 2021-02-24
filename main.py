@@ -1,4 +1,9 @@
 from selenium import webdriver
+from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
+from selenium.webdriver.firefox.options import Options
+options = Options()
+options.add_argument('-headless')
+import pandas as pd
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
@@ -11,6 +16,8 @@ import time
 import os
 
 URL = "https://www.bbc.com/weather/"
+FILENAME = "city_list.xlsx"
+FOLDER_NAME = "Cities"
 
 
 def get_city_page(city, url):
@@ -59,8 +66,14 @@ def write_to_file():
 
 
 def main():
-    # LOOP:
-    get_city_page("Amsterdam, Netherlands", URL)
+    current_path = os.path.abspath(os.getcwd())
+    file_path = os.path.join(current_path, FOLDER_NAME, FILENAME)
+    df = pd.read_excel(file_path)
+    df["location"] = df["city"] + ", " + df["country"]
+    cities = list(df["location"])
+    for city in cities:
+        link = get_city_page(city, URL)
+        print(link)
     # LOOP (TO 14):
         # get_next_day
         # download_primary_data
