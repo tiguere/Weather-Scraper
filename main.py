@@ -31,7 +31,9 @@ def get_next_day():
     # create beautiful soup on each path
     # parse and return object
     # e.g. "soup"
-    pass
+    day = requests.get(os.path.join(url, "day{}".format(day_number)))
+    soup = BeautifulSoup(day.content, 'html.parser')
+    return soup
 
 def download_primary_data(soup):
     # create loop that looks for each element that contain the "hourly" forecast in the soup
