@@ -9,6 +9,8 @@ from selenium.webdriver.common.keys import Keys
 import requests
 import time
 import os
+from bs4 import BeautifulSoup
+import re
 
 URL = "https://www.bbc.com/weather/"
 
