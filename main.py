@@ -29,6 +29,11 @@ logging.basicConfig(
 
 
 def get_city_page(city, url):
+    """receives city-name+location and send it as
+           key to the browser (URL),
+           receives back the page of the city
+           and returns the current url"""
+
     browser = webdriver.Firefox(options=options)
     time.sleep(1)
     browser.get(url)
@@ -49,12 +54,19 @@ def get_city_page(city, url):
 
 
 def get_next_day(link):
+    """returns a BeautifulSoup object
+       for the specific link (specific day)"""
+
     r = requests.get(link)
     soup = BeautifulSoup(r.text, 'html.parser')
     return soup
 
 
 def download_primary_data(city, day_num, soup):
+    """returns nested list of primary data
+        for each hour at day
+        witch scraped from the city page in the specific day_number"""
+
     today = datetime.date.today()
     hours_at_day = soup.find_all(class_="wr-time-slot-primary wr-js-time-slot-primary")
     date = today + datetime.timedelta(days=day_num)
@@ -80,6 +92,7 @@ def download_secondary_data(soup):
         # append to list_of_data
     # call write_to_file(list)
     # return list_of_secondary_data
+
     data = []
     secondary_list = soup.find_all("dl", class_="wr-time-slot-secondary__list")
     for hour in secondary_list:
@@ -92,6 +105,9 @@ def download_secondary_data(soup):
 
 
 def write_to_file(count, listed):
+    """receives data and upload it
+     into DataFrame and write it to csv file """
+
     df = pd.DataFrame(listed)
     if count > 0:
         df.to_csv('test.csv', mode='a', header=False)
@@ -108,6 +124,12 @@ def write_to_file(count, listed):
 
 
 def main():
+    """The main function read from the city_list.xlsx file
+           and scrape from each city page(url) from: https://www.bbc.com/weather/
+           primary and secondary data. uploads the data into DataFrame
+           and wright it to file.
+        """
+
     current_path = os.path.abspath(os.getcwd())
     file_path = os.path.join(current_path, CFG.FOLDER_NAME, CFG.FILENAME)
     df = pd.read_excel(file_path)
