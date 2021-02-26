@@ -6,8 +6,11 @@ A scraping utility which downloads high-resolution weather data from BBC's publi
 ### Requirements ###
 
 Selenium Driver Please see https://www.selenium.dev/downloads/
+
 Python 3 or higher
+
 Pandas
+
 Beautiful Soup
 
 ```python
