@@ -1,18 +1,16 @@
+"""
+scraping project - part 1
+scraping hourly forecasts from BBC.com/weather
+for major cities around the world
+"""
+
 from selenium import webdriver
-from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
 from selenium.webdriver.firefox.options import Options
 options = Options()
 options.add_argument('-headless')
 import pandas as pd
 from bs4 import BeautifulSoup
 import logging
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-from selenium.webdriver.support.ui import Select
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
-from selenium.webdriver.common.keys import Keys
 import requests
 import re
 import time
@@ -29,11 +27,13 @@ logging.basicConfig(
 
 
 def get_city_page(city, url):
-    """receives city-name+location and send it as
-           key to the browser (URL),
-           receives back the page of the city
-           and returns the current url"""
-
+    """
+    receives city-name+location and send it as key to the browser (URL),
+    receives back the page of the city and returns the current url
+    :param city: name of city passed in
+    :param url: url of main bbc weather web page
+    :return city_page: the path to the city weather page(s)
+    """
     browser = webdriver.Firefox(options=options)
     time.sleep(1)
     browser.get(url)
@@ -54,8 +54,10 @@ def get_city_page(city, url):
 
 
 def get_next_day(link):
-    """returns a BeautifulSoup object
-       for the specific link (specific day)"""
+    """
+    :param link: city weather day-specific link passed in
+    :return soup: a BeautifulSoup object for the specific link (specific day)
+    """
 
     r = requests.get(link)
     soup = BeautifulSoup(r.text, 'html.parser')
@@ -63,9 +65,12 @@ def get_next_day(link):
 
 
 def download_primary_data(city, day_num, soup):
-    """returns nested list of primary data
-        for each hour at day
-        witch scraped from the city page in the specific day_number"""
+    """
+    :param city: city name passed in
+    :param day_num: the number of days to offset from today
+    :param soup: the soup object to parse
+    :return a list of primary hourly forecast data scraped from the city page in the specific day
+    """
 
     today = datetime.date.today()
     hours_at_day = soup.find_all(class_="wr-time-slot-primary wr-js-time-slot-primary")
@@ -84,15 +89,10 @@ def download_primary_data(city, day_num, soup):
 
 
 def download_secondary_data(soup):
-    # create loop that looks for each element that contain the "hourly" forecast in the soup
-    # account for the fact that there is overlap between days in the carousel
-    # for e in elements (the hourly elements):
-        # list_of_data = []
-        # looking through "secondary" elements
-        # append to list_of_data
-    # call write_to_file(list)
-    # return list_of_secondary_data
-
+    """
+    :param soup: soup object passed in
+    :return data: a list of secondary hourly forecast data scraped from the city page in the specific day
+    """
     data = []
     secondary_list = soup.find_all("dl", class_="wr-time-slot-secondary__list")
     for hour in secondary_list:
@@ -105,8 +105,11 @@ def download_secondary_data(soup):
 
 
 def write_to_file(count, listed):
-    """receives data and upload it
-     into DataFrame and write it to csv file """
+    """
+    receives data, creates DataFrame and write it to csv file
+    :param count: the count of cities
+    :param listed: the list passed in
+    """
 
     df = pd.DataFrame(listed)
     if count > 0:
