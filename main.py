@@ -21,30 +21,30 @@ import os
 import config as CFG
 
 
-## CONFIGURATION OF LOGGER
+# CONFIGURATION OF LOGGER
 logging.basicConfig(
-    filename='movies.log',
+    filename='weather_scrape.log',
     format='%(asctime)s-%(levelname)s-FILE:%(filename)s-FUNCTION:%(funcName)s-LINE:%(lineno)d-%(message)s',
     level=logging.INFO)
 
 
 def get_city_page(city, url):
-    browser = webdriver.Firefox()#options=options
+    browser = webdriver.Firefox(options=options)
     time.sleep(1)
     browser.get(url)
     search = browser.find_element_by_xpath('//*[@id="ls-c-search__input-label"]')
     search.send_keys(city)
-    time.sleep(2)
+    time.sleep(1)
     try:
+        time.sleep(1)
         first_result = browser.find_element_by_xpath('//*[@id="location-list"]/li[2]/a')
         first_result.click()
-    except RuntimeError:
+    except:
         logging.info(f'UNSUCCESSFUL CLICK: MOVING ON..')
         city_page = False
-        pass
     else:
         logging.info(f'SUCCESSFULY FOUND {city} IN DROPDOWN')
-    city_page = browser.current_url
+        city_page = browser.current_url
     return city_page
 
 
@@ -91,8 +91,20 @@ def download_secondary_data(soup):
     return data
 
 
-def write_to_file():
-    pass
+def write_to_file(count, listed):
+    df = pd.DataFrame(listed)
+    if count > 0:
+        df.to_csv('test.csv', mode='a', header=False)
+    else:
+        df.to_csv('test.csv', mode='a', header=["City",
+                                                "Date",
+                                                "Hour",
+                                                "Temperature (C)",
+                                                "Chance of Rain",
+                                                "Wind Speed",
+                                                "Humidity",
+                                                "Pressure",
+                                                "Feels Like (C)"])
 
 
 def main():
@@ -101,6 +113,7 @@ def main():
     df = pd.read_excel(file_path)
     df["location"] = df["city"] + ", " + df["country"]
     cities = list(df["location"])
+    city_count = 0
     for city in cities:
         link = get_city_page(city, CFG.URL)
         if link:
@@ -108,17 +121,11 @@ def main():
                 day_soup = get_next_day(link+"/day"+str(day))
                 primary = download_primary_data(city, day, day_soup)
                 secondary = download_secondary_data(day_soup)
-                zipped = list(zip(primary, secondary))
-                df = pd.DataFrame(zipped)
-                if day == 0:
-                    df.to_csv('test.csv', mode='a', header=True)
-                else:
-                    df.to_csv('test.csv', mode='a', header=False)
-            break
-
-        # download_secondary_data
-        # write_to_file
-    pass
+                zipped_data = [zipped[0] + zipped[1] for zipped in zip(primary, secondary)]
+                write_to_file(city_count, zipped_data)
+        else:
+            pass
+        city_count += 1
 
 
 if __name__ == '__main__':
