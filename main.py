@@ -3,7 +3,6 @@ scraping project - part 1
 scraping hourly forecasts from BBC.com/weather
 for major cities around the world
 """
-
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 options = Options()
