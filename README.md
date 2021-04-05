@@ -18,7 +18,7 @@ By default, the list of cities are read from "city_list.xlsx".
 All collected daily weather data(historicals,forecasts) outputs are set into Dataframe in the first step,
 and then insert into the Database weather to the particular table according to the data source.
 
-###The Database weather 
+###The Database weather ###
 
 The Database include three different tables of Locations, Forecasts and Historical data.
 
