@@ -9,13 +9,15 @@ The list of cities are read from city_list.xlsx; each city weather data is scrap
 
 Python 3 or higher
 
-Selenium Driver -- Please see https://www.selenium.dev/downloads/
+Selenium Web Driver -- Please see https://www.selenium.dev/downloads/
 
 Pandas
 
 Requests
 
 Beautiful Soup
+
+MySQL Connector
 
 ```python
 git clone https://github.com/tiguere/ITC-Scrape.git  
