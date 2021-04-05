@@ -108,7 +108,3 @@ cd ITC-Scrape
 pip install -r requirements.txt
 ```
 
-### Contribution guidelines ###
-
-
-### Who do I talk to? ###
