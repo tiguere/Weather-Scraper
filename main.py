@@ -1,156 +1,143 @@
 """
-scraping project - part 1
-scraping hourly forecasts from BBC.com/weather
-for major cities around the world
+scraping project - part 2
+scraping hourly forecasts from BBC.com/weather as well as
+actual historical weather data from timeanddate.com
+for major cities around the world and storing in database
 """
 
-from selenium import webdriver
-from selenium.webdriver.firefox.options import Options
-options = Options()
-options.add_argument('-headless')
+
 import pandas as pd
-from bs4 import BeautifulSoup
-import logging
-import requests
-import re
-import time
-import datetime
 import os
-import config as CFG
+import config as cfg
+import click
+import logging
+from forecasts import get_forecasts_city_page
+from forecasts import get_next_day
+from forecasts import download_primary_data
+from forecasts import download_secondary_data
+from historicals import get_historical_weather
+from Database.database_design import connection
+from Database.insert_forecasts import insert_forecasts
+from Database.get_location_id import get_location_id
+from Database.insert_historical import insert_historical
+from Database.insert_locations import insert_location
 
 
 # CONFIGURATION OF LOGGER
 logging.basicConfig(
-    filename='weather_scrape.log',
+    filename='Scrape Logs/scrape_log.log',
     format='%(asctime)s-%(levelname)s-FILE:%(filename)s-FUNCTION:%(funcName)s-LINE:%(lineno)d-%(message)s',
     level=logging.INFO)
 
 
-def get_city_page(city, url):
-    """
-    receives city-name+location and send it as key to the browser (URL),
-    receives back the page of the city and returns the current url
-    :param city: name of city passed in
-    :param url: url of main bbc weather web page
-    :return city_page: the path to the city weather page(s)
-    """
-    browser = webdriver.Firefox(options=options)
-    time.sleep(1)
-    browser.get(url)
-    search = browser.find_element_by_xpath('//*[@id="ls-c-search__input-label"]')
-    search.send_keys(city)
-    time.sleep(1)
-    try:
-        time.sleep(1)
-        first_result = browser.find_element_by_xpath('//*[@id="location-list"]/li[2]/a')
-        first_result.click()
-    except:
-        logging.info(f'UNSUCCESSFUL CLICK: MOVING ON..')
-        city_page = False
-    else:
-        logging.info(f'SUCCESSFULY FOUND {city} IN DROPDOWN')
-        city_page = browser.current_url
-    return city_page
+def write_location(location, city_id):
+    con = connection()
+    cursor = con.cursor()
+    insert_location(cursor, location, city_id)
+    con.commit()
+    cursor.close()
+    con.close()
 
 
-def get_next_day(link):
-    """
-    :param link: city weather day-specific link passed in
-    :return soup: a BeautifulSoup object for the specific link (specific day)
-    """
-
-    r = requests.get(link)
-    soup = BeautifulSoup(r.text, 'html.parser')
-    return soup
-
-
-def download_primary_data(city, day_num, soup):
-    """
-    :param city: city name passed in
-    :param day_num: the number of days to offset from today
-    :param soup: the soup object to parse
-    :return a list of primary hourly forecast data scraped from the city page in the specific day
-    """
-
-    today = datetime.date.today()
-    hours_at_day = soup.find_all(class_="wr-time-slot-primary wr-js-time-slot-primary")
-    date = today + datetime.timedelta(days=day_num)
-    data = []
-    for hour in hours_at_day:
-        time_of_day = hour.find('span', class_="wr-time-slot-primary__hours wr-u-font-weight-500").text
-        if 0 <= int(time_of_day) <= 5:
-            date = today + datetime.timedelta(days=day_num+1)
-        date_string = date.strftime('%Y-%m-%d')
-        temperature = hour.find('span', class_="wr-value--temperature--c").text
-        chance_of_precipitation = re.sub(r"[a-z]", '', hour.find('div', class_="wr-u-font-weight-500").text)
-        wind_speed = hour.find('span', class_="wr-value--windspeed wr-value--windspeed--mph").text
-        data.append([city, date_string, time_of_day, temperature, chance_of_precipitation, wind_speed])
-    return data
-
-
-def download_secondary_data(soup):
-    """
-    :param soup: soup object passed in
-    :return data: a list of secondary hourly forecast data scraped from the city page in the specific day
-    """
-    data = []
-    secondary_list = soup.find_all("dl", class_="wr-time-slot-secondary__list")
-    for hour in secondary_list:
-        data_by_hour = hour.find_all('dd')
-        humidity = data_by_hour[0].text
-        pressure = data_by_hour[1].text
-        temperature_c, temperature_f = re.split(r'\D+', secondary_list[0].parent.next_sibling.text.split()[3])[:2]
-        data.append([humidity, pressure, temperature_c])
-    return data
-
-
-def write_to_file(count, listed):
+def write_forecasts(city_name, listed):
     """
     receives data, creates DataFrame and write it to csv file
-    :param count: the count of cities
+    :param city_name: the city name
     :param listed: the list passed in
     """
+    df = pd.DataFrame(listed, columns=["Scrape_Date",
+                                       "Location",
+                                       "Date",
+                                       "Hour",
+                                       "Temperature_C",
+                                       "Chance_of_Rain",
+                                       "Wind_Speed",
+                                       "Humidity",
+                                       "Pressure",
+                                       "Feels_Like_C"])
+    df = df.astype(str)
+    df = df.apply(lambda x: x.str.replace(r'[^\d.]+',
+                                          '',
+                                          regex=True) if x.name != 'Location' and x.name != 'Date' and x.name != 'Scrape_Date' else x)
+    df = df.apply(lambda x: x.str.strip())
+    con = connection()
+    select_cursor = con.cursor(buffered=True)
+    insert_cursor = con.cursor()
+    location_id = get_location_id(select_cursor, city_name)
+    select_cursor.close()
+    df.apply(lambda x: insert_forecasts(insert_cursor, x, location_id), axis=1)
+    con.commit()
+    insert_cursor.close()
+    con.close()
 
-    df = pd.DataFrame(listed)
-    if count > 0:
-        df.to_csv('test.csv', mode='a', header=False)
-    else:
-        df.to_csv('test.csv', mode='a', header=["City",
-                                                "Date",
-                                                "Hour",
-                                                "Temperature (C)",
-                                                "Chance of Rain",
-                                                "Wind Speed",
-                                                "Humidity",
-                                                "Pressure",
-                                                "Feels Like (C)"])
+
+def write_historical_weather(city_name, df):
+    """
+    receives data and inserts in mysql database
+    :param city_name: the historical data dataframe of past weather
+    :param df: the historical data dataframe of past weather
+    """
+    df = df.astype(str)
+    df = df.apply(lambda x: x.str.replace(r'[^\d.]+', '', regex=True) if x.name != 'Location' and x.name != 'Date' and x.name != 'Scrape_Date' and x.name != 'Weather' else x)
+    df = df.apply(lambda x: x.str.strip())
+    df.replace("", "-1", inplace=True)
+    con = connection()
+    select_cursor = con.cursor(buffered=True)
+    insert_cursor = con.cursor()
+    location_id = get_location_id(select_cursor, city_name)
+    select_cursor.close()
+    df.apply(lambda x: insert_historical(insert_cursor, x, location_id), axis=1)
+    con.commit()
+    insert_cursor.close()
+    con.close()
 
 
-def main():
-    """The main function read from the city_list.xlsx file
-           and scrape from each city page(url) from: https://www.bbc.com/weather/
-           primary and secondary data. uploads the data into DataFrame
-           and wright it to file.
-        """
-
+@click.command()
+@click.option('--days', default=14, type=click.IntRange(0, 14), help='Number of Days')
+@click.option('--filename', default=cfg.FILENAME)
+@click.option('--search_type',
+              type=click.Choice(['forecast', 'historical'], case_sensitive=False),
+              multiple=True,
+              default=('forecast', 'historical'))
+def main(filename, days, search_type):
+    """
+    The main function read from the city_list.xlsx file
+    and scrape from each city page(url) from: https://www.bbc.com/weather/
+    primary and secondary data. uploads the data into DataFrame
+    and wright it to file.
+    """
+    print(f"You have chosen to scrape {', '.join(search_type)} weather data spanning {days} days.")
     current_path = os.path.abspath(os.getcwd())
-    file_path = os.path.join(current_path, CFG.FOLDER_NAME, CFG.FILENAME)
+    file_path = os.path.join(current_path, cfg.FOLDER_NAME, filename)
     df = pd.read_excel(file_path)
-    df["location"] = df["city"] + ", " + df["country"]
+    df["location"] = df["city_ascii"] + ", " + df["country"]
     cities = list(df["location"])
-    city_count = 0
     for city in cities:
-        link = get_city_page(city, CFG.URL)
-        if link:
-            for day in range(0, 14):
-                day_soup = get_next_day(link+"/day"+str(day))
-                primary = download_primary_data(city, day, day_soup)
-                secondary = download_secondary_data(day_soup)
-                zipped_data = [zipped[0] + zipped[1] for zipped in zip(primary, secondary)]
-                write_to_file(city_count, zipped_data)
-        else:
-            pass
-        city_count += 1
+        if 'forecast' in search_type:
+            link_and_id = get_forecasts_city_page(city, cfg.FORECAST_URL)
+            if link_and_id:
+                link = link_and_id[0]
+                city_id = link_and_id[1]
+                write_location(city, city_id)
+                for day in range(days):
+                    day_soup = get_next_day(link+"/day"+str(day))
+                    primary = download_primary_data(city, day, day_soup)
+                    secondary = download_secondary_data(day_soup)
+                    zipped_data = [zipped[0] + zipped[1] for zipped in zip(primary, secondary)]
+                    write_forecasts(city, zipped_data)
+
+            else:
+                print(f'UNSUCCESSFUL ATTEMPT TO RETRIEVE CITY ID FOR FORECAST: {city}')
+                logging.info(f'UNSUCCESSFUL ATTEMPT TO RETRIEVE CITY ID FOR FORECAST')
+                pass
+        if 'historical' in search_type:
+            try:
+                historical_weather = get_historical_weather(city, cfg.HISTORICAL_URL, days)
+                write_historical_weather(city, historical_weather)
+            except OSError:
+                logging.info(f'Cannot find {city}')
+                print(f"Cannot request", {city})
+                pass
 
 
 if __name__ == '__main__':
