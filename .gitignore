@@ -1,6 +1,3 @@
-# ignore logs in Logs folder
-Logs/*.log
-.log
+.gitignore
 __*
-*.pyc
 .*
