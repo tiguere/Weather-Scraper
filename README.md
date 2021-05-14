@@ -1,63 +1,95 @@
 ITC-Scrape -  Weather Scraper
 ===
 
-A scraping utility which downloads, past(historicals) or/and future(forecasts), high-resolution weather data,
-around the world.
+A scraping utility which retrieves historical and/or forecast weather data in high resolution, 
+from major cities around the world.
 
-The historicals data are scraping from "www.timeanddate.com/weather" and allowing to scrape two weeks back of hourly data.
+Historical weather data is retrieved from <a href="www.timeanddate.com/weather">Time and Date</a> and enables collection of two weeks 
+worth of hourly weather data.
 
-The future(forecasts) data, scraping from BBC's public weather stations around the world,
-and allowing to scrape two weeks ahead of hourly data as well.
- 
-Using command line interface of click package, it can allow to choose the number of days which data is scraped (--days),
-between 1 to 14 days range, backward(historicals) or/and forward(forecasts) (--search_type). 
-Another option of the CLI, It allows to choose the list of locations for scrape the data (--filename).
+Forecast weather data is retrieved from <a href="https://www.bbc.com/weather/293397">BBC weather<a/>,
+enabling collection of up to two weeks worth of hourly data as well.
 
-By default, the list of cities are read from "city_list.xlsx".
+## Requirements
 
-All collected daily weather data(historicals,forecasts) outputs are set into Dataframe in the first step,
-and then insert into the Database weather to the particular table according to the data source.
+> * Python 3 or higher
+> * <a href="https://www.selenium.dev/downloads/">Selenium Web Driver</a> **
+> * Pandas
+> * Requests
+> * Beautiful Soup
+> * MySQL Connector
 
-###  The Database weather ###
+****NOTE**
+> This scraping utility uses a headless configuration of Firefox via Selenium, which
+> requires a compatible webdriver to interface with the chosen browser, Firefox. 
+> <a href="https://github.com/mozilla/geckodriver/releases">Mozilla Geckodriver</a> needs to be installed before the below examples can be run. 
+> Make sure it’s in your PATH, e.g., place it in /usr/bin or /usr/local/bin.
+> <br><br>
+> **Failure to observe this step will give you the error: <br>```Selenium.common.exceptions.WebDriverException: Message: ‘geckodriver’ executable needs to be in PATH```.**
 
-The Database include three different tables of Locations, Forecasts and Historical data.
+##  Usage ##
 
-__Locations columns:__
+#### Installation
+```
+git clone https://github.com/tiguere/ITC-Scrape.git  
+virtualenv ITC-Scrape  
+source ITC-Scrape/bin/activate  
+cd ITC-Scrape   
+pip install -r requirements.txt
+```
 
+#### Command Line
+This scraping utility can be manipulated via the following command line arguments:
+
+1. ```--days``` with default of ```14```
+2.  ```--search_type``` with default of both ```'forecast', 'historical'```
+3.  ```--filename``` with default of ```ITC-Scrape/Cities/city_list.xlsx```**
+
+
+#### Examples:
+
+1. For historical weather data spanning two days
+ ```
+ %  python3 main.py --days=2 --search_type="historical"
+ ```
+2. For both historical and forecast weather data spanning 14 days, from a file of choice.
+ ```
+ %  python3 main.py --filename="path/to/file"
+ ```
+ **NOTE**<br>
+   >This file of choice passed as ```--filename```argument must:
+   > 1. be stored in the ```Cities``` directory 
+   > 2. contain a```city``` column and a ```country``` column as headers in the first row 
+
+All collected weather data is output into the Database 
+in the corresponding table, according to arguments passed in via the CLI.
+
+****NOTE**
+>filepath *ITC-Scrape/Cities/city_list.xlsx* is set in ```cfg.FILENAME``` variable in ```config.py``` 
+
+
+
+##  Databasing
+
+The installation of this scraping utility provides a relational database which includes three tables:
+
+1. Locations
+2. Forecasts 
+3. Historical Data
+
+__Locations:__
+
+```
 Id: int NOT NULL AUTO_INCREMENT, PRIMARY KEY
 
 Name: varchar(255), Location name
 
 BBC_Id: varchar(10) NOT NULL, Location number in the url
+```
 
-__Forecasts columns:__
+__Historical:__
 
-Id: int, NOT NULL, AUTO_INCREMENT, PRIMARY KEY
-
-Scrape_Date: date, Date of the scrape
-
-Location: text, Location name
-
-Date: date, The day which the data scraped
-
-Hour: int, The hour in the specific day
-
-Temperature_C: int, Temperature in celsius
-
-Chance_of_Rain: int, Chance percent of precipitation
-
-Wind_Speed_Kph: int, Wind speed in kilometer per hour
-
-Percent_Humidity: int, Percent of humidity
-
-Pressure_Mb: int, Air pressure in millibar
-
-Feels_Like_C: int, The feels like temperature in celsius
-
-Location_Id: int, FOREIGN KEY, REFERENCES (Locations.Id)
-
-__Historical columns:__
-
+```
 Id: int, NOT NULL, AUTO_INCREMENT, PRIMARY KEY
 
 Scrape_Date: date, Date of the scrape
@@ -81,30 +113,36 @@ Pressure_Mb: int, Air pressure in millibar
 Visibility_Km: int, Visibility conditions in kilometer.
 
 Location_Id: int, FOREIGN KEY, REFERENCES (Locations.Id)
+```
+
+__Forecasts:__
+
+```
+Id: int, NOT NULL, AUTO_INCREMENT, PRIMARY KEY
+
+Scrape_Date: date, Date of the scrape
+
+Location: text, Location name
+
+Date: date, The day which the data scraped
+
+Hour: int, The hour in the specific day
+
+Temperature_C: int, Temperature in celsius
+
+Chance_of_Rain: int, Chance percent of precipitation
+
+Wind_Speed_Kph: int, Wind speed in kilometer per hour
+
+Percent_Humidity: int, Percent of humidity
+
+Pressure_Mb: int, Air pressure in millibar
+
+Feels_Like_C: int, The feels like temperature in celsius
+
+Location_Id: int, FOREIGN KEY, REFERENCES (Locations.Id)
+```
 
  __ERD Diagram__ : 
  
  ![alt text](https://github.com/tiguere/ITC-Scrape/blob/master/Database/ERD_diagram.png?raw=true)
-### Requirements ###
-
-Python 3 or higher
-
-Selenium Web Driver -- Please see https://www.selenium.dev/downloads/
-
-Pandas
-
-Requests
-
-Beautiful Soup
-
-MySQL Connector
-
-
-```python
-git clone https://github.com/tiguere/ITC-Scrape.git  
-virtualenv ITC-Scrape  
-source ITC-Scrape/bin/activate  
-cd ITC-Scrape   
-pip install -r requirements.txt
-```
-

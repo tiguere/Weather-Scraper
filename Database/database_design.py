@@ -4,6 +4,7 @@ database generation module
 """
 
 import mysql.connector
+import config as cfg
 
 DB_name = 'weather'
 tables = {
@@ -21,7 +22,6 @@ tables = {
             "CREATE TABLE IF NOT EXISTS `Forecasts` ("
             "  `Id` int NOT NULL AUTO_INCREMENT,"
             "  `Scrape_Date` date NOT NULL,"
-            "  `Location` text NOT NULL,"
             "  `Date` date NOT NULL,"
             "  `Hour` int  NOT NULL,"
             "  `Temperature_C` int NOT NULL,"
@@ -40,7 +40,6 @@ tables = {
             "CREATE TABLE IF NOT EXISTS `Historical` ("
             "  `Id` int NOT NULL AUTO_INCREMENT,"
             "  `Scrape_Date` date NOT NULL,"
-            "  `Location` text NOT NULL,"
             "  `Date` date NOT NULL,"
             "  `Hour` int  NOT NULL,"
             "  `Temperature_C` int NOT NULL,"
@@ -57,9 +56,8 @@ tables = {
 
 
 def connection():
-
     try:
-        con = mysql.connector.connect(host='localhost', database='mysql', user='root')
+        con = mysql.connector.connect(host='localhost', database='mysql', user=cfg.DB_USER, password=cfg.DB_PASS)
     except Exception as e:
         print(f"failed to connect:{e}")
         exit(1)
@@ -68,37 +66,36 @@ def connection():
 
 
 def create_database(cursor, DB_name):
-
     try:
         cursor.execute(f"CREATE DATABASE IF NOT EXISTS {DB_name}")
+        print(f"SUCCESSFULLY CREATED DATABASE: {DB_name} ")
     except mysql.connector.Error as err:
-        print(f'failed creating database:{err}')
+        print(f'FAILED TO CREATE DATABASE:{err}')
         exit(1)
     else:
-        print(f"CREATE DATABASE:{DB_name}")
+        print(f"DATABASE ALREADY EXISTS: {DB_name} ")
 
 
 def create_tables(cursor, table_dict):
-
     for table_name in tables:
         try:
             cursor.execute(table_dict[table_name])
+            print(f"SUCCESSFULLY CREATED TABLE: {table_name}")
         except mysql.connector.Error as err:
-            print(f"failed to create a table:{table_name}, {err}")
+            print(f"FAILED TO CREATE TABLE:{table_name}, {err}")
             exit(1)
         else:
-            print(f"table:{table_name}, created")
+            print(f"TABLE ALREADY EXISTS: {table_name}")
 
 
 def main():
-
     con = connection()
     cursor = con.cursor()
     create_database(cursor, DB_name=DB_name)
     try:
         cursor.execute(f"USE {DB_name}")
     except mysql.connector.Error as err:
-        print(f"failed to use Database: {DB_name}.")
+        print(f"FAILED TO CONNECT TO: {DB_name}.")
         exit(1)
 
     create_tables(cursor, tables)
@@ -107,7 +104,6 @@ def main():
 
 
 if __name__ == '__main__':
-
     main()
 
 

@@ -4,7 +4,7 @@ scraping hourly forecasts from BBC.com/weather
 for major cities around the world
 """
 
-from selenium.webdriver.firefox.options import Options
+# from selenium.webdriver.firefox.options import Options
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from bs4 import BeautifulSoup
@@ -15,23 +15,13 @@ import datetime
 import logging
 
 
-# CONFIGURATION OF SELENIUM WEB BROWSER OPTIONS
-options = Options()
-options.add_argument('-headless')
-
-# CONFIGURATION OF LOGGER
-logging.basicConfig(
-    filename='Scrape Logs/forecasts_scrape.log',
-    format='%(asctime)s-%(levelname)s-FILE:%(filename)s-FUNCTION:%(funcName)s-LINE:%(lineno)d-%(message)s',
-    level=logging.INFO)
-
-
-def get_forecasts_city_page(city, url):
+def get_forecasts_city_page(city, url, options):
     """
     receives city-name+location and send it as key to the browser (URL),
     receives back the page of the city and returns the current url
     :param city: name of city passed in
     :param url: url of main bbc weather web page
+    :param options: the selenium config options
     :return city_page: the path to the city weather page(s)
     """
     browser = webdriver.Firefox(options=options)

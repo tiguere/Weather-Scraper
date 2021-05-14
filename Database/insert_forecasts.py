@@ -9,7 +9,6 @@ import mysql.connector
 def insert_forecasts(cur, row, city_id):
     cur.execute(f'''SELECT * FROM weather.Forecasts WHERE Date = '{row.Date}' 
             AND Hour = '{row.Hour}' 
-            AND Location = '{row.Location}'
             AND Date = '{row.Date}'
             AND Temperature_C = '{row.Temperature_C}'
             AND Chance_of_Rain = '{row.Chance_of_Rain}'
@@ -25,7 +24,6 @@ def insert_forecasts(cur, row, city_id):
         try:
             cur.execute(f'''INSERT INTO weather.Forecasts (
                                           Scrape_Date,
-                                          Location,
                                           Date,
                                           Hour,
                                           Temperature_C,
@@ -37,7 +35,6 @@ def insert_forecasts(cur, row, city_id):
                                           Location_Id
                                           ) VALUES (
                                             '{row.Scrape_Date}',
-                                            '{row.Location}', 
                                             '{row.Date}',
                                             '{row.Hour}',
                                             '{row.Temperature_C}',
@@ -47,7 +44,7 @@ def insert_forecasts(cur, row, city_id):
                                             '{row.Pressure}',
                                             '{row.Feels_Like_C}',
                                             '{city_id}')''')
-            print(f"WEATHER FORECAST INSERTED FOR: {row.Location} on {row.Date} at {row.Hour}")
+            print(f"WEATHER FORECAST INSERTED FOR CITY OF ID: {city_id} on {row.Date} at {row.Hour}")
         except mysql.connector.Error as err:
             print(f"{err}: failed to insert for row: \n{row}.")
             exit(1)

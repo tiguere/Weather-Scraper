@@ -8,7 +8,6 @@ import mysql.connector
 
 def insert_historical(cur, row, city_id):
     cur.execute(f'''SELECT * FROM weather.Historical WHERE Date = '{row.Date}' 
-            AND Location = '{row.Location}' 
             AND Date = '{row.Date}'
             AND Hour = '{row.Time}'
             AND Temperature_C = '{row.Temp}'
@@ -25,7 +24,6 @@ def insert_historical(cur, row, city_id):
         try:
             cur.execute(f'''INSERT INTO weather.Historical (
                                           Scrape_Date,
-                                          Location,
                                           Date,
                                           Hour,
                                           Temperature_C,
@@ -37,7 +35,6 @@ def insert_historical(cur, row, city_id):
                                           Location_Id
                                           ) VALUES (
                                             '{row.Scrape_Date}',
-                                            '{row.Location}', 
                                             '{row.Date}',
                                             '{row.Time}',
                                             '{row.Temp}',
@@ -47,7 +44,7 @@ def insert_historical(cur, row, city_id):
                                             '{row.Pressure}',
                                             '{row.Visibility}',
                                             '{city_id}')''')
-            print(f"HISTORICAL WEATHER INSERTED FOR: {row.Location} on {row.Date} at {row.Time}")
+            print(f"HISTORICAL WEATHER INSERTED FOR CITY OF ID {city_id} on {row.Date} at {row.Time}")
         except mysql.connector.Error as err:
             print(f"{err}: failed to insert for row: \n{row}.")
             exit(1)

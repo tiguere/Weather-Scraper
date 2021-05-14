@@ -1,2 +1,6 @@
-# ignore all logs *.log 
-*.log
+# ignore logs in Logs folder
+Logs/*.log
+cli_parser.py
+*.pyc
+.*
+!/.gitignore

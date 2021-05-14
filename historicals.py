@@ -4,23 +4,13 @@ scraping hourly historical data from timeanddate.com/weather
 for major cities around the world
 """
 
-from selenium.webdriver.firefox.options import Options
+# from selenium.webdriver.firefox.options import Options
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 import pandas as pd
 import time
 import datetime
 import logging
-
-# CONFIGURATION OF SELENIUM WEB BROWSER OPTIONS
-options = Options()
-options.add_argument('-headless')
-
-# CONFIGURATION OF LOGGER
-logging.basicConfig(
-    filename='Scrape Logs/historicals_scrape.log',
-    format='%(asctime)s-%(levelname)s-FILE:%(filename)s-FUNCTION:%(funcName)s-LINE:%(lineno)d-%(message)s',
-    level=logging.INFO)
 
 
 def get_previous_day(browser, day_num, location):
@@ -63,13 +53,14 @@ def get_table(day_num, location, html):
         pass
 
 
-def get_historical_weather(location, url, num_days):
+def get_historical_weather(location, url, num_days, options):
     """
     receives city-name+location and send it as key to the browser (URL),
     receives back the page of the city and returns the current url
     :param location: location passed in as (city, country)
     :param url: url of historical weather web page
     :param num_days: number of days to look back
+    :param options: the selenium config options
     :return city_page: the path to the city weather page(s)
     """
     city_name = location.split(", ")[0].replace(" ", "-")
