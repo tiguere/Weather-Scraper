@@ -8714,3 +8714,18 @@ Exiting due to channel error.
 console.log: WebExtensions: reset-default-search: No addons in our list are installed.
 console.log: WebExtensions: reset-default-search: No addons in our list are installed.
 console.log: WebExtensions: reset-default-search: No addons in our list are installed.
+1620999546600	geckodriver	INFO	Listening on 127.0.0.1:59915
+1620999547621	mozrunner::runner	INFO	Running command: "/Applications/Firefox.app/Contents/MacOS/firefox-bin" "--marionette" "-headless" "-foreground" "-no-remote" "-profile" "/var/folders/td/9pt24xxn74s52bhw6nf4h3v80000gn/T/rust_mozprofilewVg9ke"
+*** You are running in headless mode.
+console.warn: SearchSettings: "get: No settings file exists, new profile?" (new Error("", "(unknown module)"))
+1620999549528	Marionette	INFO	Listening on port 59926
+1620999549576	Marionette	WARN	TLS certificate errors will be ignored for this session
+JavaScript warning: https://pagead2.googlesyndication.com/bg/DyQI0nSy6BUFz1wbhNnw1YMoJJCDSr_iJxDmlzQsBeQ.js line 1 > eval line 629 > eval line 1 > eval, line 1: Failed to create WebGL context: WebGL creation failed: 
+* Can't use WebGL in headless mode (https://bugzil.la/1375585).
+JavaScript warning: https://pagead2.googlesyndication.com/bg/DyQI0nSy6BUFz1wbhNnw1YMoJJCDSr_iJxDmlzQsBeQ.js line 1 > eval line 1862 > eval line 1 > eval, line 1: Failed to create WebGL context: WebGL creation failed: 
+* Can't use WebGL in headless mode (https://bugzil.la/1375585).
+JavaScript warning: https://pagead2.googlesyndication.com/bg/DyQI0nSy6BUFz1wbhNnw1YMoJJCDSr_iJxDmlzQsBeQ.js line 1 > eval line 1613 > eval line 1 > eval, line 1: Failed to create WebGL context: WebGL creation failed: 
+* Can't use WebGL in headless mode (https://bugzil.la/1375585).
+Exiting due to channel error.
+Exiting due to channel error.
+Exiting due to channel error.
