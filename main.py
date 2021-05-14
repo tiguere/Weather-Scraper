@@ -41,7 +41,6 @@ def logger_config():
     logging.basicConfig(filename='Logs/scrape_log.log',
                         format='%(asctime)s-%(levelname)s-FILE:%(filename)s-FUNCTION:%(funcName)s-LINE:%(lineno)d-%(message)s',
                         level=logging.INFO)
-    print("called logger_config function")
     logging.info(f"Logger configured {time.ctime()}")
 
 

@@ -5,6 +5,5 @@ bs4
 click
 numpy
 mysql-connector-python
-html5lib
-logging
+html5libgit
 datetime

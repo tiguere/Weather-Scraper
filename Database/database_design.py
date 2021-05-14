@@ -77,10 +77,9 @@ def create_database(cursor, DB_name):
 
 
 def create_tables(cursor, table_dict):
-    for table_name in tables:
+    for table_name in table_dict.keys():
         try:
             cursor.execute(table_dict[table_name])
-            print(f"SUCCESSFULLY CREATED TABLE: {table_name}")
         except mysql.connector.Error as err:
             print(f"FAILED TO CREATE TABLE:{table_name}, {err}")
             exit(1)
