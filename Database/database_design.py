@@ -52,7 +52,26 @@ tables = {
             "  FOREIGN KEY (`Location_Id`) REFERENCES `Locations` (`Id`),"
             "  PRIMARY KEY (`Id`)"
             ") ENGINE=InnoDB"
-        )}
+        ),
+    'Pollution':
+        (
+            "CREATE TABLE IF NOT EXISTS `Pollution` ("
+            "  `Location_Id` int NOT NULL,"
+            "  `location` varchar(30),"
+            "  `date` date,"
+            "  `time` int,"
+            "  `CO` float,"
+            "  `NO` float,"
+            "  `NO2` float,"
+            "  `O3` float,"
+            "  `SO2` float,"
+            "  `NH3` float,"
+            "  `PM2_5` float,"
+            "  `PM10` float,"
+            "  FOREIGN KEY (`Location_Id`) REFERENCES `Locations` (`Id`)"
+            ") ENGINE=InnoDB"
+        )
+}
 
 
 def connection():
@@ -98,6 +117,8 @@ def main():
         exit(1)
 
     create_tables(cursor, tables)
+    cursor.execute('ALTER DATABASE weather CHARACTER SET utf8 COLLATE utf8_general_ci;')
+    cursor.execute('ALTER TABLE Locations CONVERT TO CHARACTER SET utf8 COLLATE utf8_general_ci;')
     cursor.close()
     con.close()
 
