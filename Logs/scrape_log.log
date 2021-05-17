@@ -1,0 +1,7 @@
+2021-05-17 09:18:03,081-INFO-FILE:main.py-FUNCTION:logger_config-LINE:44-Logger configured Mon May 17 09:18:03 2021
+2021-05-17 09:18:03,081-INFO-FILE:main.py-FUNCTION:main-LINE:173-configuration of logger called: Mon May 17 09:18:03 2021
+2021-05-17 09:18:42,367-INFO-FILE:main.py-FUNCTION:logger_config-LINE:44-Logger configured Mon May 17 09:18:42 2021
+2021-05-17 09:18:42,367-INFO-FILE:main.py-FUNCTION:main-LINE:173-configuration of logger called: Mon May 17 09:18:42 2021
+2021-05-17 09:18:42,727-INFO-FILE:main.py-FUNCTION:main-LINE:176-configuration of selenium called: Mon May 17 09:18:42 2021
+2021-05-17 09:18:42,727-INFO-FILE:main.py-FUNCTION:main-LINE:177-Starting scrape: Mon May 17 09:18:42 2021
+2021-05-17 09:18:44,561-INFO-FILE:main.py-FUNCTION:parse_arguments-LINE:130-ATTEMPTING TO RETRIEVE CITY Tokyo, Japan

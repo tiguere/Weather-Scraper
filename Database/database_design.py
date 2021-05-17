@@ -6,7 +6,6 @@ database generation module
 import mysql.connector
 import config as cfg
 
-DB_name = 'weather'
 tables = {
     'Locations':
         (
@@ -76,7 +75,10 @@ tables = {
 
 def connection():
     try:
-        con = mysql.connector.connect(host='localhost', database='mysql', user=cfg.DB_USER, password=cfg.DB_PASS)
+        con = mysql.connector.connect(host='localhost',
+                                      database='mysql',
+                                      user=cfg.DB_USER,
+                                      password=cfg.DB_PASS)
     except Exception as e:
         print(f"failed to connect:{e}")
         exit(1)
@@ -84,15 +86,15 @@ def connection():
         return con
 
 
-def create_database(cursor, DB_name):
+def create_database(cursor, db_name=cfg.DB_NAME):
     try:
-        cursor.execute(f"CREATE DATABASE IF NOT EXISTS {DB_name}")
-        print(f"SUCCESSFULLY CREATED DATABASE: {DB_name} ")
+        cursor.execute(f"CREATE DATABASE IF NOT EXISTS {db_name}")
+        print(f"SUCCESSFULLY CREATED DATABASE: {db_name} ")
     except mysql.connector.Error as err:
         print(f'FAILED TO CREATE DATABASE:{err}')
         exit(1)
     else:
-        print(f"DATABASE ALREADY EXISTS: {DB_name} ")
+        print(f"DATABASE ALREADY EXISTS: {db_name} ")
 
 
 def create_tables(cursor, table_dict):
@@ -109,11 +111,11 @@ def create_tables(cursor, table_dict):
 def main():
     con = connection()
     cursor = con.cursor()
-    create_database(cursor, DB_name=DB_name)
+    create_database(cursor, db_name=cfg.DB_NAME)
     try:
-        cursor.execute(f"USE {DB_name}")
+        cursor.execute(f"USE {cfg.DB_NAME}")
     except mysql.connector.Error as err:
-        print(f"FAILED TO CONNECT TO: {DB_name}.")
+        print(f"FAILED TO CONNECT TO: {db_name}.")
         exit(1)
 
     create_tables(cursor, tables)
