@@ -17,6 +17,8 @@ from forecasts import get_next_day
 from forecasts import download_primary_data
 from forecasts import download_secondary_data
 from historicals import get_historical_weather
+from request_api import get_city_pollution
+from request_api import insert_pollution
 from Database import database_design
 from Database.database_design import connection
 from Database.insert_forecasts import insert_forecasts
@@ -150,8 +152,17 @@ def parse_arguments(cities, days, search_type, options):
                 historical_weather = get_historical_weather(city, cfg.HISTORICAL_URL, days, options)
                 write_historical_weather(city, historical_weather)
             except OSError:
-                logging.info(f'UNSUCCESSFUL ATTEMPT TO RETRIEVE {city}')
-                print(f"UNSUCCESSFUL ATTEMPT TO RETRIEVE {city}")
+                logging.info(f'UNSUCCESSFUL ATTEMPT TO RETRIEVE HISTORICAL WEATHRE FOR {city}')
+                print(f"UNSUCCESSFUL ATTEMPT TO RETRIEVE HISTORICAL WEATHER FOR {city}")
+                pass
+        if 'pollution' in search_type:
+            try:
+                pollution_data = get_city_pollution(city.split(",")[0], city.split(",")[1],
+                                                    cfg.API_TOKEN, cfg.API_ENDPOINT)
+                insert_pollution(pollution_data, city.split(",")[0])
+            except OSError:
+                logging.info(f'UNSUCCESSFUL ATTEMPT TO RETRIEVE POLLUTION FOR {city}')
+                print(f"UNSUCCESSFUL ATTEMPT TO RETRIEVE POLLUTION FOR {city}")
                 pass
 
 
@@ -159,15 +170,13 @@ def parse_arguments(cities, days, search_type, options):
 @click.option('--days', default=14, type=click.IntRange(0, 14), help='Number of Days')
 @click.option('--filename', default=cfg.FILENAME)
 @click.option('--search_type',
-              type=click.Choice(['forecast', 'historical'], case_sensitive=False),
+              type=click.Choice(['forecast', 'historical', 'pollution'], case_sensitive=False),
               multiple=True,
               default=('forecast', 'historical'))
 def main(days, filename, search_type):
     """
-    The main function read from the city_list.xlsx file
-    and scrape from each city page(url) from: https://www.bbc.com/weather/
-    primary and secondary data. uploads the data into DataFrame
-    and wright it to file.
+    The main function reads from your cities file
+    and scrapes according to your request:
     """
     logger_config()
     logging.info(f"configuration of logger called: {time.ctime()}")

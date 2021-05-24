@@ -6,3 +6,4 @@ click
 numpy
 mysql-connector-python
 datetime
+geopy

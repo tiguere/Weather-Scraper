@@ -1,3 +1,7 @@
 __*
 .*
+Database/__pycache__/*
+Logs/scrape_log.log
+.idea/*
 scrape_log.log
+geckodriver.log

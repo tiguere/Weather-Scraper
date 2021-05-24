@@ -42,7 +42,7 @@ tables = {
             "  `Date` date NOT NULL,"
             "  `Hour` int  NOT NULL,"
             "  `Temperature_C` int NOT NULL,"
-            "  `Weather` varchar(30) NOT NULL,"
+            "  `Weather` text NOT NULL,"
             "  `Wind_Speed_Kph` int NOT NULL,"
             "  `Percent_Humidity` int NOT NULL,"
             "  `Pressure_Mb` int NOT NULL,"

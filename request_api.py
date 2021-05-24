@@ -42,9 +42,9 @@ def insert_pollution(data, city):
     con = connection()
     cursor = con.cursor()
     cursor.execute(f"select Id from weather.Locations where Name ='{city}'")
-    id = cursor.fetchone()[0]
+    id_to_insert = cursor.fetchone()[0]
 
-    data.insert(0, id)
+    data.insert(0, id_to_insert)
     check = """select Pollution.location,Pollution.date,Pollution.time
                    from weather.Pollution where Pollution.location=%s
                    and weather.Pollution.date=%s
