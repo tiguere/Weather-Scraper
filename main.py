@@ -167,9 +167,9 @@ def parse_arguments(cities, days, search_type, options):
 
 
 @click.command()
-@click.option('--days', default=14, type=click.IntRange(0, 14), help='Number of Days')
-@click.option('--filename', default=cfg.FILENAME)
-@click.option('--search_type',
+@click.option('--days', '-d', default=14, type=click.IntRange(0, 14), help='Number of Days')
+@click.option('--filename', '-f', default=cfg.FILENAME)
+@click.option('--search_type', '-t',
               type=click.Choice(['forecast', 'historical', 'pollution'], case_sensitive=False),
               multiple=True,
               default=('forecast', 'historical'))

@@ -93,6 +93,3 @@ def insert_pollution(data, city):
                 con.commit()
                 cursor.close()
                 con.close()
-
-
-
