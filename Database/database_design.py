@@ -115,7 +115,7 @@ def main():
     try:
         cursor.execute(f"USE {cfg.DB_NAME}")
     except mysql.connector.Error as err:
-        print(f"FAILED TO CONNECT TO: {db_name}.")
+        print(f"FAILED TO CONNECT TO: {cfg.DB_NAME}.")
         exit(1)
 
     create_tables(cursor, tables)
