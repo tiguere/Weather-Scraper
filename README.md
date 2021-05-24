@@ -94,8 +94,6 @@ Id: int, NOT NULL, AUTO_INCREMENT, PRIMARY KEY
 
 Scrape_Date: date, Date of the scrape
 
-Location: text, Location name
-
 Date: date, The day which the data scraped
 
 Hour: int, The hour in the specific day
@@ -122,8 +120,6 @@ Id: int, NOT NULL, AUTO_INCREMENT, PRIMARY KEY
 
 Scrape_Date: date, Date of the scrape
 
-Location: text, Location name
-
 Date: date, The day which the data scraped
 
 Hour: int, The hour in the specific day
@@ -143,6 +139,33 @@ Feels_Like_C: int, The feels like temperature in celsius
 Location_Id: int, FOREIGN KEY, REFERENCES (Locations.Id)
 ```
 
+
+__Pollution:__
+
+```
+Location_Id: int, NOT NULL, FOREIGN KEY REFERENCES (Locations.Id)
+
+Date: date, Date of the scrape
+
+Time: int, The hour in the specific day
+
+CO: float, Сoncentration of CO (Carbon monoxide), μg/m3
+
+NO: float, Сoncentration of NO (Nitrogen monoxide), μg/m3
+
+NO2: float, Сoncentration of NO2 (Nitrogen dioxide), μg/m3
+
+O3: float, Сoncentration of O3 (Ozone), μg/m3
+
+SO2: float,	Сoncentration of SO2 (Sulphur dioxide), μg/m3
+
+NH3: float, Сoncentration of NH3 (Ammonia), μg/m3
+
+PM2_5: float, Сoncentration of PM2.5, (Fine Particulate matter), ug/m3
+
+PM10 float, Сoncentration of PM10 (Coarse particulate matter), μg/m3
+```
+
  __ERD Diagram__ : 
  
- ![alt text](https://github.com/tiguere/ITC-Scrape/blob/master/Database/ERD_diagram.png?raw=true)
+ ![alt text](https://github.com/tiguere/ITC-Scrape/blob/master/Database/weather.png?raw=true)

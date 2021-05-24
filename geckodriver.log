@@ -204,3 +204,6 @@ JavaScript warning: https://pagead2.googlesyndication.com/bg/CWq9ndk-1oeaRFSw5-g
 * Can't use WebGL in headless mode (https://bugzil.la/1375585).
 1621856141244	Marionette	INFO	Stopped listening on port 55617
 console.log: WebExtensions: reset-default-search: No addons in our list are installed.
+console.log: WebExtensions: reset-default-search: No addons in our list are installed.
+console.log: WebExtensions: reset-default-search: No addons in our list are installed.
+console.log: WebExtensions: reset-default-search: No addons in our list are installed.
