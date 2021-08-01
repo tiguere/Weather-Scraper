@@ -1,4 +1,4 @@
-ITC-Scrape -  Weather Scraper
+Weather Scraper
 ===
 
 A scraping utility which retrieves historical and/or forecast weather data in high resolution, 
